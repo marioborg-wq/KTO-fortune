@@ -423,6 +423,10 @@
           <span class="ctrl-label">Last Win</span>
           <span class="ctrl-value win-val" id="winVal">R$ 0,00</span>
         </div>
+        <div class="ctrl-item">
+          <span class="ctrl-label">Total Win</span>
+          <span class="ctrl-value win-val" id="totalWinVal">R$ 0,00</span>
+        </div>
       </div>
 
       <div class="spin-wrap">
@@ -480,7 +484,7 @@ const REELS=3, ROWS=3;
 const BET_LEVELS=[0.5,1,2,5,10,20,50];
 const PAYLINES=[[1,1,1],[0,0,0],[2,2,2],[0,1,2],[2,1,0]];
 
-let balance=1000, betIdx=1, spinning=false, autoSpin=false, autoTimer=null, displayGrid=[];
+let balance=1000, betIdx=1, spinning=false, autoSpin=false, autoTimer=null, displayGrid=[], totalWin=0;
 
 const totalW=SYMBOLS.reduce((s,sym)=>s+sym.weight,0);
 function randSymbol(){
@@ -586,6 +590,7 @@ function fmt(v){ return 'R$ '+v.toFixed(2).replace('.',','); }
 function updateUI(){
   document.getElementById('balanceVal').textContent=fmt(balance);
   document.getElementById('betVal').textContent=fmt(BET_LEVELS[betIdx]);
+  document.getElementById('totalWinVal').textContent=fmt(totalWin);
 }
 function changeBet(d){ betIdx=Math.max(0,Math.min(BET_LEVELS.length-1,betIdx+d)); updateUI(); }
 function maxBet(){ betIdx=BET_LEVELS.length-1; updateUI(); }
@@ -652,19 +657,21 @@ async function spin(){
     animateReel(r,finalGrid[r],r*180).then(()=>playReelStopSound(r))
   ));
 
-  const {totalWin,winCells}=evaluate(finalGrid);
+  const {totalWin: spinWin, winCells}=evaluate(finalGrid);
   document.getElementById('spinBtn').classList.remove('spinning');
 
-  if(totalWin>0){
-    balance+=totalWin; updateUI();
-    document.getElementById('winVal').textContent=fmt(totalWin);
+  if(spinWin>0){
+    balance+=spinWin;
+    totalWin+=spinWin;
+    document.getElementById('winVal').textContent=fmt(spinWin);
+    updateUI();
     highlightWins(winCells);
-    if(totalWin>=bet*20){
-      setMsg(`🎉 BIG WIN! +${fmt(totalWin)}`,'big-win');
+    if(spinWin>=bet*20){
+      setMsg(`🎉 BIG WIN! +${fmt(spinWin)}`,'big-win');
       launchParticles();
       playWinSound(true);
     } else {
-      setMsg(`WIN! +${fmt(totalWin)}`,'win');
+      setMsg(`WIN! +${fmt(spinWin)}`,'win');
       playWinSound(false);
     }
   } else {
