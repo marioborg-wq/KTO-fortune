@@ -234,6 +234,8 @@
   .bet-row { display: flex; align-items: center; gap: 8px; }
   .bet-btn {
     width: 28px; height: 28px;
+    min-width: 28px; min-height: 28px;
+    flex-shrink: 0;
     border-radius: 50%;
     border: 1px solid #2a2a3a;
     background: #141420;
@@ -244,6 +246,7 @@
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
     line-height: 1;
+    aspect-ratio: 1;
   }
   .bet-btn:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
   .bet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -696,7 +699,7 @@ let audioCtx = null;
 let muted     = false;
 
 // Background music via HTMLAudio (works in all contexts incl. blob/preview)
-const bgAudio = new Audio('assets/Play_High.wav');
+const bgAudio = new Audio('assets/Play_High.mp3');
 bgAudio.loop   = true;
 bgAudio.volume = 0.35;
 
